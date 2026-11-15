@@ -79,10 +79,82 @@ async function chat() {
     list('#vocab-hints', scene.vocabulary || [], (li, word) => { li.textContent = `${word.lemma} · ${word.meaning_zh}`; });
     list('#grammar-hints', scene.grammar || [], (li, grammar) => { li.append(element('strong', '', grammar.pattern), document.createTextNode(`：${grammar.explanation_zh}`)); });
     list('#sentence-hints', scene.sentence_hints || [], (li, hint) => { li.textContent = hint; });
+    // This provider can later be replaced by a backend while the lookup UI stays unchanged.
+    let lookupData;
+    async function lookupChinese(query) {
+      if (!lookupData) lookupData = await loadJSON('data/lookup.json');
+      return lookupData.find((entry) => entry.aliases.includes(query.trim())) || null;
+    }
+    const draft = $('#message-input');
+    const panel = $('#lookup-panel');
+    const result = $('#lookup-result');
+    let selectedMarker = null;
+    let requestId = 0;
+    function markers() {
+      return [...draft.value.matchAll(/\[([^\[\]]*[\u3400-\u9fff][^\[\]]*)\]/g)]
+        .map((match) => ({ text: match[0], query: match[1].trim(), start: match.index }));
+    }
+    function updateMarkers() {
+      const container = $('#draft-markers'); container.replaceChildren();
+      const found = markers();
+      if (!found.length) $('#draft-warning').hidden = true;
+      found.forEach((marker, index) => {
+        const button = element('button', 'draft-marker', `查詢 ${marker.text}`);
+        button.type = 'button';
+        button.addEventListener('click', () => {
+          selectedMarker = { ...marker, index, draft: draft.value };
+          panel.open = true; $('#lookup-input').value = marker.query;
+          runLookup(marker.query, selectedMarker);
+        });
+        container.append(button);
+      });
+    }
+    async function runLookup(query, marker = null) {
+      const currentRequest = ++requestId;
+      result.replaceChildren();
+      if (!query.trim()) { result.append(element('p', 'lookup-status', '請輸入想查詢的中文詞語。')); return; }
+      result.append(element('p', 'lookup-status', '查詢中…'));
+      try {
+        const entry = await lookupChinese(query);
+        if (currentRequest !== requestId) return;
+        result.replaceChildren();
+        if (!entry) { result.append(element('p', 'lookup-status', 'Demo 詞庫尚未收錄這個詞語，請試試其他詞。')); return; }
+        const card = element('div', 'lookup-result-card');
+        card.append(element('h3', '', entry.expression_ko));
+        [['原形',entry.lemma],['中文意思',entry.meaning_zh],['詞幹／詞根',entry.stem_zh],['詞尾與變化',entry.ending_zh],['使用情境與語氣',entry.usage_zh],['例句',`${entry.example_ko}　${entry.example_zh}`]].forEach(([label,value]) => {
+          const row = element('p'); row.append(element('strong', '', `${label}：`), document.createTextNode(value || '未提供')); card.append(row);
+        });
+        if (marker) {
+          card.append(element('p', '', '選擇詞形後才會替換這個標記；請依句子自行調整詞尾。'));
+          const forms = element('div', 'lookup-forms');
+          entry.forms.forEach((form) => {
+            const button = element('button', 'insert-form', `填入 ${form}`); button.type = 'button';
+            button.addEventListener('click', () => {
+              if (draft.value !== marker.draft || draft.value.slice(marker.start, marker.start + marker.text.length) !== marker.text) {
+                result.replaceChildren(element('p', 'lookup-status', '草稿已變更，請重新選擇要查詢的標記。')); return;
+              }
+              draft.setRangeText(form, marker.start, marker.start + marker.text.length, 'end');
+              selectedMarker = null; updateMarkers(); draft.focus();
+              result.replaceChildren(element('p', 'lookup-status', '已填入選擇的詞形，請確認是否符合句子。'));
+            });
+            forms.append(button);
+          }); card.append(forms);
+        }
+        result.append(card);
+      } catch (error) {
+        if (currentRequest === requestId) result.replaceChildren(element('p', 'lookup-status', '詞庫載入失敗，請稍後再試。'));
+      }
+    }
+    draft.addEventListener('input', updateMarkers);
+    $('#lookup-button').addEventListener('click', () => { selectedMarker = null; runLookup($('#lookup-input').value); });
+    $('#lookup-input').addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' && !event.isComposing) { event.preventDefault(); selectedMarker = null; runLookup(event.currentTarget.value); }
+    });
     let turn = 0;
     $('#chat-form').addEventListener('submit', (event) => {
       event.preventDefault(); const input = $('#message-input'); const value = input.value.trim(); if (!value) return;
-      addMessage('user', value); input.value = '';
+      if (markers().length) { $('#draft-warning').hidden = false; input.focus(); return; }
+      addMessage('user', value); input.value = ''; updateMarkers();
       const matches = (scene.responses || []).filter((response) => response.keywords.some((keyword) => value.includes(keyword)));
       const choices = matches.length ? matches.map((match) => match.text) : scene.fallback_replies;
       addMessage('assistant', choices[turn % choices.length]); turn++; input.focus();

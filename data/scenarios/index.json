@@ -16,5 +16,11 @@
     "title_zh": "週末計畫",
     "description_zh": "和朋友聊聊週末想做的事",
     "file": "data/scenarios/weekend-plan.json"
+  },
+  {
+    "id": "restaurant-order",
+    "title_zh": "餐廳點餐",
+    "description_zh": "和朋友一起選菜、加點與結帳",
+    "file": "data/scenarios/restaurant-order.json"
   }
 ]

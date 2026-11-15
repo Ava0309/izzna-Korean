@@ -1,0 +1,83 @@
+{
+  "id": "weekend-plan",
+  "title_zh": "週末計畫",
+  "description_zh": "和朋友聊聊週末想做的事",
+  "emoji": "🌿",
+  "label": "輕鬆閒聊",
+  "opening_ko": "이번 주말에 뭐 할 거야? 나는 집에서 쉬고 싶어.",
+  "reply_ideas_zh": [
+    "分享想去的地方",
+    "聊聊想在家做的事",
+    "問朋友要不要一起出門"
+  ],
+  "vocabulary": [
+    {
+      "surface": "주말에",
+      "lemma": "주말",
+      "meaning_zh": "在週末",
+      "stem_zh": "주말（名詞）",
+      "ending_zh": "-에：表示時間的助詞",
+      "analysis_zh": "名詞 주말 後接時間助詞 -에，表示事情發生的時間。",
+      "example_ko": "주말에 친구를 만났어.",
+      "example_zh": "週末見了朋友。"
+    },
+    {
+      "surface": "싶어",
+      "lemma": "싶다",
+      "meaning_zh": "想要",
+      "stem_zh": "싶-",
+      "ending_zh": "-어：非敬語現在式",
+      "analysis_zh": "動詞詞幹接 -고 싶어，表示說話者想做某事。",
+      "example_ko": "집에서 쉬고 싶어.",
+      "example_zh": "想在家休息。"
+    }
+  ],
+  "grammar": [
+    {
+      "pattern": "-고 싶어",
+      "explanation_zh": "接動詞詞幹，表示想做某件事。",
+      "example_ko": "영화 보고 싶어.",
+      "example_zh": "想看電影。"
+    }
+  ],
+  "sentence_hints": [
+    "주말에 ___ 할 거야.（週末打算……）",
+    "___ 하고 싶어.（想做……）"
+  ],
+  "responses": [
+    {
+      "keywords": [
+        "영화",
+        "드라마"
+      ],
+      "text": "오, 재밌겠다! 나도 영화 보고 싶어."
+    },
+    {
+      "keywords": [
+        "집",
+        "쉬"
+      ],
+      "text": "집에서 푹 쉬는 것도 좋지. 나도 그럴 것 같아."
+    },
+    {
+      "keywords": [
+        "친구",
+        "만나",
+        "갈 거",
+        "가려고"
+      ],
+      "text": "좋다! 친구랑 즐거운 시간 보내."
+    }
+  ],
+  "fallback_replies": [
+    "좋은 계획이다! 주말이 기다려진다.",
+    "그렇구나. 나는 아직 계획을 정하는 중이야.",
+    "좋다! 편하게 보내는 게 제일이지."
+  ],
+  "demo_messages": [
+    {
+      "role": "assistant",
+      "text": "이번 주말에 뭐 할 거야? 나는 집에서 쉬고 싶어."
+    }
+  ]
+}

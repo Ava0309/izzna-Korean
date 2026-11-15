@@ -1,0 +1,20 @@
+[
+  {
+    "id": "gym",
+    "title_zh": "健身日常",
+    "description_zh": "和朋友聊聊今天的運動",
+    "file": "data/scenarios/gym.json"
+  },
+  {
+    "id": "cafe",
+    "title_zh": "咖啡廳時間",
+    "description_zh": "和朋友聊喜歡的飲料與甜點",
+    "file": "data/scenarios/cafe.json"
+  },
+  {
+    "id": "weekend-plan",
+    "title_zh": "週末計畫",
+    "description_zh": "和朋友聊聊週末想做的事",
+    "file": "data/scenarios/weekend-plan.json"
+  }
+]
